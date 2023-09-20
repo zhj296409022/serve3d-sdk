@@ -1,4 +1,4 @@
-from datasource import Datasource, COLMAPSparseMappingDatasource 
+from .datasource import Datasource, COLMAPSparseMappingDatasource 
 from typing import Dict 
 
 def colmap2nerf(input: COLMAPSparseMappingDatasource): 

@@ -7,18 +7,24 @@ import json
 NOTIFY_TYPE = Literal['url'] 
 
 
-class NotifyDescriptor: 
+class Notify: 
   """ 回调描述 """ 
   
-  def __init__(self, notify: Optional[Dict] = None): 
-    if notify is not None:
-      self.from_json(notify)
+  def __init__(self, notify: Optional[Dict] = None):  
+    if notify is not None: 
+      self.from_json(notify) 
+  
+  @abstractmethod 
+  def notify(self, data: Dict): pass 
   
   @abstractmethod 
   def from_json(self): pass 
+  
+  def to_json(self):
+    return self.__dict__
 
 
-class URLNotifyDescriptor: 
+class URLNotify: 
   """ 回调 """ 
 
   url: str 
@@ -43,7 +49,11 @@ class URLNotifyDescriptor:
     self.url = notify['url'] 
 
 
-def create_notify(type: NOTIFY_TYPE, notify: Dict): 
+def create_notify(notify: Dict): 
+  type = notify.get('type')
+  
   if type == 'url': 
-    return URLNotifyDescriptor(notify) 
+    return URLNotify(notify) 
+  else:
+    raise Exception(f'do not support notify type: {type} ')
 
