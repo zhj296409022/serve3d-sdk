@@ -110,7 +110,10 @@ class Client:
     """ 建图 """ 
     response: Response = requests.post( 
       url=self.prepare_url('/api/v1/mapping/', args.get('base_url')), 
-      headers={ 'Content-Type': 'application/json' }, 
+      headers={ 
+               'Content-Type': 'application/json',
+               'method': 'mapping'
+      }, 
       json = request.to_dict() 
     ) 
     
@@ -123,7 +126,10 @@ class Client:
     """ 建模 """ 
     response: Response = requests.post( 
       url=self.prepare_url('/api/v1/model/', args.get('base_url')), 
-      headers={ 'Content-Type': 'application/json' }, 
+      headers={ 
+               'Content-Type': 'application/json',
+               'method': 'model'
+      }, 
       json = request.to_dict() 
     ) 
     
@@ -136,6 +142,9 @@ class Client:
     """ 定位 """ 
     response: Response = requests.post( 
       url=self.prepare_url('/api/v1/localize/', args.get('base_url')), 
+      headers={
+        'method': 'localize'
+      },
       files={ 'file': image }, 
       json = data 
     ) 
