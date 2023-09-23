@@ -13,7 +13,7 @@ setup(
   author=__author__, 
   author_email='296409022@qq.com', 
   description='serve3d sdk', 
-  packages=find_packages(where='serve3d_sdk'), 
+  packages=['serve3d_sdk'], 
   install_requires=install_requires 
 ) 
 

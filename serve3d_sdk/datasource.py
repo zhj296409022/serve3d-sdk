@@ -1,6 +1,8 @@
 from .types import DATASOURCE, DATA_DIR 
-from typing import Dict 
+from urllib.request import urlopen 
 from pathlib import Path 
+from typing import Dict 
+from io import BytesIO
 import requests 
 import zipfile 
 import shutil 
@@ -139,12 +141,11 @@ def upload_datasource(url: str, dir: Path, tmp_path: Path):
 
 def download_datasource(url: str, dir: Path): 
   """ 下载zip到本地 """ 
-  response = requests.get(url, stream=True) 
-
   if not dir.exists(): dir.mkdir(parents=True, exist_ok=True) 
-
-  with zipfile.ZipFile(response.content) as zipFile: 
-    zipFile.extractall(dir) 
+  
+  with urlopen(url) as zipresp:
+    with zipfile.ZipFile(BytesIO(zipresp.read())) as zipFile: 
+      zipFile.extractall(dir) 
 
 def open_datasource(id: str, dir: str=DATA_DIR): 
   """ 创建数据源 """ 

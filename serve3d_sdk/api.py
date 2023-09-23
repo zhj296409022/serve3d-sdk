@@ -74,27 +74,23 @@ class Client:
     else: 
       raise Exception('base_url is None') 
     
-  def get_download_url(self, scene_id: str, type: DATASOURCE, **args): 
+  def get_download_url(self, scene_id: str, source_id: str, **args): 
     """ 获取下载链接 """
     response: Response = requests.get( 
-      url = self.prepare_url(f'/api/v1/scene/{scene_id}/download/', args.get('base_url')),
-      headers={ 'Content-Type': 'application/json' }, 
-      json = { 
-        scene_id, 
-        type 
-      } 
+      url = self.prepare_url(f'/api/v1/ar/scene/{scene_id}/source/{source_id}/download/', args.get('base_url')),
+      headers=args.get('headers')
     ) 
-    
+
     if response.status_code != 200: 
       raise exceptions.HTTPError(response=response) 
   
-    return response.json() 
+    return response.json()
 
   def get_upload_url(self, scene_id: str, type: DATASOURCE, **args):
     """ 获取上传链接 """ 
     response: Response = requests.get(
-      url = self.prepare_url(f'/api/v1/scene/{scene_id}/upload/', args.get('base_url')), 
-      headers={ 'Content-Type': 'application/json' }, 
+      url = self.prepare_url(f'/api/v1/ar/scene/{scene_id}/upload/', args.get('base_url')), 
+      headers={ 'Content-Type': 'application/json', **(args.get('headers') or {}) }, 
       json = {
         scene_id, 
         type 
@@ -106,15 +102,16 @@ class Client:
 
     return response.json() 
 
-  def mapping(self, request: ReconstructionRequest, **args): 
+  def mapping(self, data: Dict, **args): 
     """ 建图 """ 
     response: Response = requests.post( 
-      url=self.prepare_url('/api/v1/mapping/', args.get('base_url')), 
+      url=self.prepare_url('', args.get('base_url')), 
       headers={ 
                'Content-Type': 'application/json',
-               'method': 'mapping'
+               'method': 'mapping',
+               **(args.get('headers') or {})
       }, 
-      json = request.to_dict() 
+      json = data 
     ) 
     
     if response.status_code != 200: 
@@ -122,15 +119,16 @@ class Client:
   
     return response.json() 
   
-  def model(self, request: ModelRequest, **args): 
+  def model(self, data: Dict, **args): 
     """ 建模 """ 
     response: Response = requests.post( 
-      url=self.prepare_url('/api/v1/model/', args.get('base_url')), 
+      url=self.prepare_url('', args.get('base_url')), 
       headers={ 
                'Content-Type': 'application/json',
-               'method': 'model'
+               'method': 'model',
+               **(args.get('headers') or {})
       }, 
-      json = request.to_dict() 
+      json = data
     ) 
     
     if response.status_code != 200: 
@@ -141,13 +139,30 @@ class Client:
   def localize(self, data: Dict, image, **args): 
     """ 定位 """ 
     response: Response = requests.post( 
-      url=self.prepare_url('/api/v1/localize/', args.get('base_url')), 
+      url=self.prepare_url('', args.get('base_url')), 
       headers={
-        'method': 'localize'
+        'method': 'localize',
+        **(args.get('headers') or {})
       },
       files={ 'file': image }, 
       json = data 
     ) 
+    
+    if response.status_code != 200: 
+      raise exceptions.HTTPError(response=response) 
+
+    return response.json() 
+  
+  def get_pointcloud(self, id: str, **args):
+    response: Response = requests.post(
+      url=self.prepare_url('', args.get('base_url')),
+      headers={
+        'Content-Type': 'application/json',
+        'method': 'pointcloud',
+        **(args.get('headers') or {})
+      },
+      json={ id }
+    )
     
     if response.status_code != 200: 
       raise exceptions.HTTPError(response=response) 
